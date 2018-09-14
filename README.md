@@ -2,7 +2,7 @@
 A mod for Stellaris that adds rogue colonies
 
 3 main kinds of Rogue Colonies 
-  1. Mid-game crisis rogue colony
+  1. The Ascendancy: a Mid-game crisis rogue colony 
   2. One planet minors that aren't necessarily crises and should be normal empires
   3. Refugee empires spawning out of specific circumstances
 

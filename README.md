@@ -6,7 +6,7 @@ A mod for Stellaris that adds rogue colonies
   2. One planet minors that aren't necessarily crises and should be normal empires
   3. Refugee empires spawning out of specific circumstances
 
-# Characteristics of the Ascendancy Rogue Empire Colony
+# The Ascendancy 
  Will have superior tech and Fallen Empire Surplus Ships
  Will found their capital on a random planet
  look at distar.3014 & distar.3016 (Nivlac) and syndaw.1022
@@ -19,7 +19,8 @@ Grant them all habitablity technologies. They'll need it lol. It cannot be resea
   - Can happen to AI
   - Still retains the negative opinion from the homeworld as these are renegade colonists
 
-# Refugee empires are special one planet minors created from refugee pops
+# Refugee Empires
+  Refugee empires are special one planet minors created from refugee pops
   - Possible ways refugee empires are created:
     - being purged
     - is_under_crisis_bombardment

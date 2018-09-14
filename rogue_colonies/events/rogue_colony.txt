@@ -1,0 +1,754 @@
+# Event chain:
+  # embezzelment
+  # missing ships (both naval and civil)
+  # missing pops
+  # Surprise Laconia! Ends event chain
+
+# Characteristics of the Rogue Empire Colony
+ # Will have superior tech and Fallen Empire Surplus Ships
+ # Will found their capital on a random planet
+  # look at distar.3014 & distar.3016 (Nivlac)
+  # syndaw.1022
+
+# root = ship scope
+# from = planet scope
+
+
+# inspired by the rogue Martian colony in the Expanse series
+namespace = laconia
+
+# Start of event chain
+# embezzelment of credits and minerals
+# missing military ships
+# missing construction ships
+# missing admiral
+# murdered scientist?
+
+# missing pops
+
+# Rogue empire is spawned
+country_event = {
+  id = laconia.201
+  title = laconia.201.name
+  desc = laconia.201.desc
+	picture = GFX_evt_news_room
+	show_sound = event_red_alert
+	location = event_target:rogue_colony_planet
+  is_triggered_only = yes
+
+  # mean_time_to_happen = { months = 40 }
+
+  # find any free planet
+  trigger = {
+    #is_ai = no
+		any_system = {
+			any_planet = {
+				#is_colonizable = yes
+				has_owner = no
+				is_colony = no
+				#habitable_planet = yes
+				has_anomaly = no
+				NOR = {
+					has_modifier = "holy_planet"
+					solar_system = {
+						has_star_flag = hostile_system
+					}
+				}
+				distance = {
+					source = root.owner.capital_scope
+					max_distance <= 300
+					min_distance >= 10 #50
+				}
+				solar_system = {
+					NOT = { exists = starbase }
+				}
+			}
+		}
+	}
+
+  # build colony on any free planet
+  immediate = {
+    save_event_target_as = rogue_colony_victim
+    owner_species = { save_event_target_as = rogue_colony_species }
+		random_planet = {
+      # Find a random planet
+			limit = {
+				# is_colonizable = yes
+				has_owner = no
+				is_colony = no
+				# habitable_planet = yes
+				has_anomaly = no
+        planet_size > 16
+        planet_size < 26
+				NOR = {
+          is_asteroid = yes
+          is_star = yes
+          is_planet_class = pc_gas_giant
+          is_planet_class = pc_ringworld_habitable
+          is_planet_class = pc_ringworld_habitable_damaged
+          is_planet_class = pc_ringworld_tech
+          is_planet_class = pc_ringworld_tech_damaged
+          is_planet_class = pc_ringworld_seam
+          is_planet_class = pc_ringworld_seam_damaged
+          is_planet_class = pc_habitat
+          has_modifier = "holy_planet"
+					solar_system = {
+						has_star_flag = hostile_system
+					}
+				}
+				distance = {
+					source = root.owner.capital_scope
+					max_distance <= 300
+					min_distance >= 10 #50
+				}
+				solar_system = {
+					NOT = { exists = starbase }
+				}
+			}
+			orbital_deposit_tile = { clear_deposits = yes }
+      # change to gaia (using secret tech cache)
+      change_pc = pc_gaia
+      reset_planet = yes
+			save_global_event_target_as = rogue_colony_planet
+		}
+		create_country = {
+			name = "Galactic [Root.GetSpeciesAdj] Ascendancy"
+			authority = random
+      species = event_target:rogue_colony_species
+			ignore_initial_colony_error = yes
+      day_zero_contact = no
+			ethos = {
+        ethic = ethic_authoritarian
+        ethic = ethic_fanatic_militarist
+        #should make an opposite Laconia for empires that were already authoritarian. Probably a Freehold or Commune
+      }
+      civics = {
+        civic = random
+        civic = random
+      }
+			flag = random
+			type = default
+			effect = {
+				save_global_event_target_as = rogue_colony_empire
+				add_minerals = 50000
+				add_energy = 50000
+				add_food = 200
+				add_influence = 900
+        add_unity = 60000
+        establish_communications_no_message = event_target:rogue_colony_victim
+			}
+		}
+    # set up the capital
+		event_target:rogue_colony_planet = {
+			solar_system = {
+				create_starbase = {
+					size = starbase_starfortress
+					owner = event_target:rogue_colony_empire
+          module = shipyard
+  				building = crew_quarters
+          effect = {
+  					set_starbase_module = {
+  						slot = 1
+  						module = anchorage
+  					}
+  					set_starbase_module = {
+  						slot = 2
+  						module = anchorage
+  					}
+  					set_starbase_module = {
+  						slot = 3
+  						module = trading_hub
+  					}
+  					set_starbase_module = {
+  						slot = 4
+  						module = trading_hub
+  					}
+  					set_starbase_module = {
+  						slot = 5
+  						module = trading_hub
+  					}
+  					set_starbase_building = {
+  						slot = 1
+  						building = hydroponics_bay
+  					}
+  				}
+				}
+			}
+			set_owner = event_target:rogue_colony_empire
+			set_capital = yes
+			clear_blockers = yes
+			solar_system = {
+				every_system_planet = {
+					surveyed = {
+						set_surveyed = yes
+						surveyor = root.owner
+					}
+				}
+			}
+			random_tile = {
+				limit = {
+					has_building = no
+					has_grown_pop = no
+          num_adjacent_tiles > 3
+				}
+				create_pop = {
+					species = event_target:rogue_colony_species
+				}
+				set_building = building_capital_3
+        set_deposit = d_enormous3_energy_deposit
+			}
+      random_tile = {
+				limit = {
+					has_grown_pop = no
+					has_growing_pop = no
+				}
+				create_pop = {
+					species = event_target:rogue_colony_species
+				}
+				set_building = building_ancient_factory
+				set_deposit = d_enormous3_mineral_deposit
+			}
+  		random_tile = {
+  			limit = {
+  				has_grown_pop = no
+  				has_growing_pop = no
+  			}
+  			create_pop = {
+  				species = event_target:rogue_colony_species
+  			}
+  			set_building = building_dark_matter_power_plant
+  			set_deposit = d_enormous3_energy_deposit
+  		}
+      while = {
+        count = 2
+  			random_tile = {
+  				limit = {
+  					has_grown_pop = no
+  					has_growing_pop = no
+  				}
+  				create_pop = {
+  					species = event_target:rogue_colony_species
+  				}
+  				set_building = building_agri_processing_complex
+  				set_deposit = d_immense_farmland_deposit
+  			}
+      }
+      random_tile = {
+				limit = {
+					has_grown_pop = no
+					has_growing_pop = no
+				}
+				create_pop = {
+					species = event_target:rogue_colony_species
+				}
+				set_building = betharian_power_plant
+				set_deposit = d_betharian_deposit
+			}
+			random_tile = {
+				limit = {
+					has_grown_pop = no
+					has_growing_pop = no
+				}
+				create_pop = {
+					species = event_target:rogue_colony_species
+				}
+        set_building = building_ancient_archives
+				set_deposit = d_enormous3_engineering_deposit
+			}
+      random_tile = {
+				limit = {
+					has_grown_pop = no
+					has_growing_pop = no
+				}
+				create_pop = {
+					species = event_target:rogue_colony_species
+				}
+        set_building = building_ancient_archives
+				set_deposit = d_enormous3_physics_deposit
+			}
+      random_tile = {
+				limit = {
+					has_grown_pop = no
+					has_growing_pop = no
+				}
+				create_pop = {
+					species = event_target:rogue_colony_species
+				}
+        set_building = building_institute
+				set_deposit = d_enormous3_engineering_deposit
+			}
+      random_tile = {
+				limit = {
+					has_grown_pop = no
+					has_growing_pop = no
+				}
+				create_pop = {
+					species = event_target:rogue_colony_species
+				}
+        set_building = building_clone_vats
+				set_deposit = d_enormous3_society_deposit
+			}
+      random_tile = {
+				limit = {
+					has_grown_pop = no
+					has_growing_pop = no
+				}
+				create_pop = {
+					species = event_target:rogue_colony_species
+				}
+        set_building = building_military_academy
+				set_deposit = d_enormous3_society_deposit
+			}
+      random_tile = {
+				limit = {
+					has_grown_pop = no
+					has_growing_pop = no
+				}
+				create_pop = {
+					species = event_target:rogue_colony_species
+				}
+        set_building = building_hospital
+				set_deposit = d_enormous3_society_deposit
+			}
+      random_tile = {
+				limit = {
+					has_grown_pop = no
+					has_growing_pop = no
+				}
+				create_pop = {
+					species = event_target:rogue_colony_species
+				}
+        set_building = building_paradise_dome
+				set_deposit = d_immense_farmland_deposit
+			}
+      while = {
+        count = 3
+        random_tile = {
+  				limit = {
+  					has_grown_pop = no
+  					has_growing_pop = no
+  				}
+  				create_pop = {
+  					species = event_target:rogue_colony_species
+  				}
+          set_building = building_fortress
+  			}
+      }
+			while = {
+				count = 20
+				create_army = {
+					name = random
+					owner = event_target:rogue_colony_empire
+					species = event_target:rogue_colony_species
+					type = defense_army
+				}
+			}
+      while = {
+				count = 10
+				create_army = {
+					name = random
+					owner = event_target:rogue_colony_empire
+					species = event_target:rogue_colony_species
+					type = assault_army
+				}
+			}
+      while = {
+				count = 15
+				create_army = {
+					name = random
+					owner = event_target:rogue_colony_empire
+					species = event_target:rogue_colony_species
+					type = clone_army
+				}
+			}
+      while = {
+				count = 5
+				create_army = {
+					name = random
+					owner = event_target:rogue_colony_empire
+					species = event_target:rogue_colony_species
+					type = gene_warrior_army
+				}
+			}
+      # Create/set the ruler
+      create_leader = {
+				type = ruler
+				species = event_target:rogue_colony_species
+				name = random
+				skill = 10
+        save_event_target_as = rogue_colony_ruler
+			}
+			set_leader = last_created_leader
+		}
+    last_created_country = {
+      #capital_scope = { set_name = NAME_rogue_colony }
+      country_event = { id = laconia.202 days = 1 }
+    }
+    every_country = {
+      establish_communications_no_message = event_target:rogue_colony_empire
+    }
+    event_target:rogue_colony_empire = {
+			add_opinion_modifier = {
+				who = root
+				modifier = opinion_traitors_to_our_empire
+			}
+		}
+    event_target:rogue_colony_victim = {
+      add_opinion_modifier = {
+				who = event_target:rogue_colony_empire
+				modifier = opinion_rogue_empire_is_better
+			}
+    }
+	}
+
+	option = {
+		name = "Let's see what these traitors have to say!"
+    hidden_effect = {
+      country_event = { id = laconia.203 }
+    }
+	}
+}
+
+# Rogue Colony Setting Up 1
+country_event = {
+  id = laconia.202
+  hide_window = yes
+  is_triggered_only = yes
+  fire_only_once = yes
+
+  immediate = {
+    # change the name of the capital
+    capital_scope = { set_name = NAME_rogue_colony }
+    # get vicitms's technologies
+    copy_techs_from = {
+			target = event_target:rogue_colony_victim
+			except = {
+				# exclude techs here
+			}
+		}
+    # get more technologies
+    owner = {
+      give_technology = { tech = tech_destroyers message = no }
+    }
+    # survey host's surveyed planets
+		every_planet = {
+			limit = {
+				is_surveyed = {
+					who = event_target:rogue_colony_victim
+					status = yes
+				}
+			}
+			surveyed = {
+				set_surveyed = yes
+				surveyor = root
+			}
+		}
+    # create admiral 1
+    create_leader = {
+      type = admiral
+      species = event_target:rogue_colony_species
+      name = random
+      skill = 5
+      event_leader = no
+    }
+    # military fleet 1
+    create_fleet = {
+      name = "[Root.GetSpeciesAdj] Supremacy"
+      settings = {spawn_debris = no}
+      effect = {
+        while = {
+          count = 7
+          create_ship = {
+            name = "Ancient Cache Battlecruiser"
+            design = "NAME_Beta"
+            graphical_culture = "fallen_empire_01"
+          }
+        }
+        while = {
+          count = 9
+          create_ship = {
+            name = "Ancient Cache Escort"
+            design = "NAME_Gamma"
+            graphical_culture = "fallen_empire_01"
+          }
+        }
+        set_owner = event_target:rogue_colony_empire
+        set_location = event_target:rogue_colony_planet
+        set_leader = last_created_leader
+      }
+    }
+    create_leader = {
+      type = admiral
+      species = event_target:rogue_colony_species
+      name = random
+      skill = 8
+      event_leader = no
+    }
+    # military fleet 2
+    create_fleet = {
+      name = "[Root.Leader.GetName]'s Will"
+      settings = {spawn_debris = no}
+      effect = {
+        while = {
+          count = 1
+          create_ship = {
+            name = "Ascendancy"
+            design = "NAME_Alpha"
+            graphical_culture = "fallen_empire_01"
+          }
+        }
+        while = {
+          count = 7
+          create_ship = {
+            name = "Ancient Cache Battlecruiser"
+            design =  "NAME_Beta"
+            graphical_culture = "fallen_empire_01"
+          }
+        }
+        set_owner = root.owner
+        set_location = event_target:rogue_colony_planet
+        set_leader = last_created_leader
+      }
+    }
+    # give construction ships x3
+    create_fleet = {
+			effect = {
+				set_owner = prev
+
+				create_ship = {
+					name = random
+					random_existing_design = constructor
+				}
+
+				set_fleet_stance = evasive
+				set_location = prev.capital_star
+			}
+		}
+    create_fleet = {
+			effect = {
+				set_owner = event_target:rogue_colony_empire
+				create_ship = {
+					name = random
+					random_existing_design = constructor
+				}
+				set_fleet_stance = evasive
+				set_location = event_target:rogue_colony_planet
+			}
+		}
+    create_fleet = {
+			effect = {
+				set_owner = event_target:rogue_colony_empire
+				create_ship = {
+					name = random
+					random_existing_design = constructor
+				}
+				set_fleet_stance = evasive
+				set_location = event_target:rogue_colony_planet
+			}
+		}
+    # give science ship with scientist
+    create_fleet = {
+			effect = {
+				set_owner = event_target:rogue_colony_empire
+				create_ship = {
+					name = random
+					random_existing_design = science
+				}
+				set_fleet_stance = evasive
+				set_location = event_target:rogue_colony_planet
+				owner = {
+					create_leader = {
+						type = scientist
+						sub_type = survey
+						name = random
+						species = owner_main_species
+					}
+				}
+				set_leader = last_created_leader
+			}
+		}
+    # increase border
+    capital_scope = {
+      solar_system = {
+        # jump 1
+        every_neighbor_system = {
+          limit = {
+            has_owner = no
+            NOR = {
+              solar_system = {
+    						has_star_flag = hostile_system
+    					}
+            }
+            solar_system = {
+    					NOT = { exists = starbase }
+    				}
+          }
+          create_starbase = {
+  					size = starbase_starfortress
+  					owner = root
+            module = anchorage
+            building = naval_logistics_office
+            effect = {
+    					set_starbase_module = {
+    						slot = 1
+    						module = anchorage
+    					}
+    					set_starbase_module = {
+    						slot = 2
+    						module = anchorage
+    					}
+    					set_starbase_module = {
+    						slot = 3
+    						module = anchorage
+    					}
+    					set_starbase_module = {
+    						slot = 4
+    						module = anchorage
+    					}
+    					set_starbase_module = {
+    						slot = 5
+    						module = anchorage
+    					}
+    					set_starbase_building = {
+    						slot = 1
+    						building = naval_logistics_office
+    					}
+    				}
+  				}
+          # jump 2
+          every_neighbor_system = {
+            limit = {
+              has_owner = no
+              NOR = {
+                solar_system = {
+      						has_star_flag = hostile_system
+      					}
+              }
+              solar_system = {
+      					NOT = { exists = starbase }
+      				}
+            }
+            create_starbase = {
+    					size = starbase_outpost
+    					owner = root
+    				}
+            # jump 3
+            every_neighbor_system = {
+              limit = {
+                has_owner = no
+                NOR = {
+                  solar_system = {
+        						has_star_flag = hostile_system
+        					}
+                }
+                solar_system = {
+        					NOT = { exists = starbase }
+        				}
+              }
+              create_starbase = {
+      					size = starbase_outpost
+      					owner = root
+      				}
+            }
+            # jump 4
+            every_neighbor_system = {
+              limit = {
+                has_owner = no
+                NOR = {
+                  solar_system = {
+        						has_star_flag = hostile_system
+        					}
+                }
+                solar_system = {
+        					NOT = { exists = starbase }
+        				}
+              }
+              create_starbase = {
+      					size = starbase_outpost
+      					owner = root
+      				}
+              # jump 5
+              every_neighbor_system = {
+                limit = {
+                  has_owner = no
+                  NOR = {
+                    solar_system = {
+          						has_star_flag = hostile_system
+          					}
+                  }
+                  solar_system = {
+          					NOT = { exists = starbase }
+          				}
+                }
+                create_starbase = {
+        					size = starbase_outpost
+        					owner = root
+        				}
+              }
+            }
+          }
+        }
+      }
+    }
+    # create mining Stations
+    event_target:rogue_colony_empire = {
+      every_planet_within_border = {
+        limit = { has_deposit_for = shipclass_mining_station }
+        create_mining_station = { owner = event_target:ratling_country }
+      }
+    }
+    # give bonuses
+    event_target:rogue_colony_empire = {
+      add_modifier = {
+				modifier = rogue_colony_empire_bonuses
+				days = 7200
+			}
+    }
+    declare_war = {
+			target = event_target:rogue_colony_victim
+			name = "NAME_rogue_colony_war"
+			attacker_war_goal = "wg_end_threat"
+		}
+  }
+}
+
+# Rogue Colony Communications
+country_event = {
+  id = laconia.203
+  title = laconia.203.name
+  desc = laconia.203.desc
+  diplomatic = yes
+  is_triggered_only = yes
+  fire_only_once = yes
+
+  picture_event_data = {
+    portrait = event_target:rogue_colony_empire #rogue_colony_ruler # change to event target leader
+    planet_background = event_target:rogue_colony_empire
+    graphical_culture = event_target:rogue_colony_empire
+    city_level = event_target:rogue_colony_empire
+    room = event_target:rogue_colony_empire
+  }
+
+  option = {
+		name = laconia.203.a
+		response_text = laconia.203.a.response
+		is_dialog_only = yes
+	}
+  option = {
+		name = laconia.203.b
+		response_text = laconia.203.b.response
+		is_dialog_only = yes
+	}
+    option = {
+  		name = laconia.203.c
+  		response_text = laconia.203.c.response
+      is_dialog_only = yes
+  	}
+    option = {
+  		name = laconia.203.d
+  		response_text = laconia.203.d.response
+      # is_dialog_only = yes # remove to close dialog
+  	}
+}
+
+# rogue_colony_victim and rogue_colony_empire gets opinion maluses on each other

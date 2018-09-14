@@ -1,0 +1,39 @@
+# All global modifiers are here.  They are applied from certain game-features.
+# Effects are fully scriptable here.
+# The names can NOT be removed or changed since the code references them
+
+# Ancient Cache
+rogue_colony_empire_bonuses = {
+	country_starbase_upkeep_mult = -0.5
+	ship_upkeep_mult = -0.7
+	country_naval_cap_add = 200
+	country_naval_cap_mult = 0.6
+	pop_consumer_goods_mult = -0.3
+	country_resource_minerals_mult = 1
+	country_resource_energy_mult = 1.2
+}
+
+uncharted_colony_bonuses = {
+	country_naval_cap_mult = 0.1
+	ship_upkeep_mult = -0.15
+	country_resource_minerals_mult = 0.25
+	country_resource_energy_mult = 0.25
+	pop_consumer_goods_mult = -0.2
+	pop_happiness = 0.25
+	pop_growth_speed = 0.40
+}
+
+# only valid for 5 years after the start of their war for independence. These patriots are desperate to protect their independence!
+uncharted_colony_independence_war_bonuses = {
+	country_naval_cap_mult = 1
+	ship_upkeep_mult = -0.9
+	country_naval_cap_add = 100
+	ship_hull_mult = 0.80
+	pop_consumer_goods_mult = -0.7
+	country_resource_minerals_mult = 2
+	planet_building_build_speed_mult = 0.5
+	starbase_shipyard_build_speed_mult = 0.8
+	planet_army_build_speed_mult = 0.5
+	country_resource_minerals_add = 20
+	country_resource_energy_add = 20
+}

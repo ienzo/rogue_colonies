@@ -1,0 +1,462 @@
+# Refugee empires are special one planet minors created from refugee pops
+  # Possible ways refugee empires are created:
+    # being purged
+    # is_under_crisis_bombardment
+    # is enslaved
+    # is self modified
+    # is bio-trophy
+
+# Names:
+  # Mutant government / metahuman authority
+  # Mutant New Homeland
+  # The [System name] Refuge
+  # Free Authority
+  # Unleashed
+
+namespace = refugee_empire
+
+# refugee_empire.100s refer to finding pops to make the refugee empire out of
+# Find a valid refugee pop among pops being purged
+pop_event = {
+  id = refugee_empire.101
+  hide_window = yes
+
+	# fire_only_once = yes
+
+  trigger = {
+		exists = owner
+		owner = { is_country_type = default }
+		planet = { is_controlled_by = owner }
+		AND = {
+			has_citizenship_type = { type = citizenship_purge }
+			NOT = { has_purge_type = { type = purge_displacement } }
+		}
+    # is_being_purged = yes
+		is_valid_refugee_pop = yes
+	}
+
+  mean_time_to_happen = {
+		years = 5 # 10 # 50
+	}
+
+  immediate = {
+		# refugee_pop_effect = yes
+    save_event_target_as = refugee_empire_founder_pop
+    planet = {
+      owner = {
+        save_event_target_as = filthy_purger_country
+        country_event = { id = refugee_empire.201 days = 1 } #100 }
+      }
+    }
+	}
+}
+
+# find a pop under crisis bombardment
+pop_event = {
+  id = refugee_empire.102
+  hide_window = yes
+  trigger = {
+    exists = owner
+    owner = { is_country_type = default }
+    planet = {
+      is_controlled_by = owner
+      is_under_crisis_bombardment = yes
+    }
+    is_valid_refugee_pop = yes
+  }
+  mean_time_to_happen = {
+		years = 20
+		modifier = {
+			factor = 0.1
+			planet = { is_under_crisis_bombardment = yes }
+		}
+	}
+  immediate = {
+    refugee_pop_effect = yes
+    save_event_target_as = refugee_empire_founder_pop_02
+    planet = {
+      owner = {
+        save_event_target_as = escaped_from_empire_under_crisis
+        country_event = { id = refugee_empire.201 days = 1 } #100 }
+      }
+    }
+  }
+}
+
+# find a trait_self_modified pop
+pop_event = {
+  id = refugee_empire.103
+  hide_window = yes
+  trigger = {
+    has_pop_flag = modified_pop_1
+    planet = {
+			has_planet_flag = pop_modification
+			has_planet_flag = popmod_rising_tensions
+		}
+  }
+  mean_time_to_happen = {
+		months = 220
+	}
+  immediate = {
+		refugee_pop_effect = yes
+    save_event_target_as = mutant_empire_founder_pop
+    planet = {
+      owner = {
+        save_event_target_as = mutant_empire_forebearer_country
+        country_event = { id = refugee_empire.203 days = 1 } #100 }
+      }
+    }
+	}
+}
+
+# find an enslaved pop
+pop_event = {
+  id = refugee_empire.104
+  hide_window = yes
+  trigger = {
+    NOT = { is_same_species = owner }
+    is_enslaved = yes
+    #is_being_purged = no
+    is_robot_pop = no
+  }
+  immediate = {
+
+  }
+}
+
+# find a bio-trophy pop
+# citizenship_organic_trophy
+
+# refugee_empire.200s refer to setting up particular refugee empire types
+# Create the Refugee Empire with the refugee pop
+country_event = {
+  id = refugee_empire.201
+  hide_window = yes
+  is_triggered_only = yes
+
+  trigger = {
+    # find a free planet
+    any_system = {
+      any_planet = {
+				is_colonizable = yes
+				has_owner = no
+				is_colony = no
+				habitable_planet = yes
+        habitability = { who = event_target:refugee_empire_founder_pop value > 0.19 }
+				has_anomaly = no
+				NOR = {
+          has_modifier = "holy_planet"
+					solar_system = { has_star_flag = hostile_system }
+				}
+				distance = {
+					source = root.owner.capital_scope
+					max_distance <= 1000 # 300
+					min_distance >= 50
+				}
+				solar_system = {
+					NOT = { exists = starbase }
+				}
+			}
+    }
+  }
+  immediate = {
+    # Find a suitable capital for the Refugees
+    random_planet = {
+			limit = {
+				is_colonizable = yes
+				has_owner = no
+				is_colony = no
+				habitable_planet = yes
+        habitability = { who = event_target:refugee_empire_founder_pop value > 0.19 }
+				has_anomaly = no
+        planet_size > 10
+				NOR = {
+          is_asteroid = yes
+          is_star = yes
+          is_planet_class = pc_gas_giant
+          is_planet_class = pc_ringworld_habitable_damaged
+          is_planet_class = pc_ringworld_tech
+          is_planet_class = pc_ringworld_tech_damaged
+          is_planet_class = pc_ringworld_seam
+          is_planet_class = pc_ringworld_seam_damaged
+          has_modifier = "holy_planet"
+					solar_system = { has_star_flag = hostile_system	}
+				}
+				distance = {
+					source = root.owner.capital_scope
+					max_distance <= 1000
+					min_distance >= 50
+				}
+				solar_system = {
+					NOT = { exists = starbase }
+				}
+			}
+			orbital_deposit_tile = { clear_deposits = yes }
+			save_global_event_target_as = refugee_empire_capital_planet
+		}
+    create_country = {
+      name = "Free Haven"
+      type = default
+      flag = random
+      ignore_initial_colony_error = yes
+      day_zero_contact = no
+      species = event_target:refugee_empire_founder_pop
+      ethos = {
+        ethic = ethic_egalitarian
+        ethic = ethic_xenophile
+        ethic = ethic_militarist
+      }
+      authority = auth_democratic
+      civics = {
+        civic = civic_idealistic_foundation
+        civic = civic_free_haven
+      }
+      effect = {
+				save_global_event_target_as = refugee_empire_country
+				add_minerals = 20000
+				add_energy = 20000
+				add_food = 20000
+				add_influence = 1000
+        add_unity = 3000
+        establish_communications_no_message = event_target:filthy_purger_country
+			}
+      # set up the capital
+      event_target:refugee_empire_capital_planet ={
+        solar_system = {
+          create_starbase = {
+  					size = starbase_starport
+  					owner = event_target:refugee_empire_country
+  				}
+        }
+        set_owner = event_target:refugee_empire_country
+        set_capital = yes
+  			clear_blockers = yes
+        solar_system = {
+  				every_system_planet = {
+  					surveyed = {
+  						set_surveyed = yes
+  						surveyor = event_target:refugee_empire_country
+  					}
+  				}
+  			}
+        random_tile = {
+  				limit = {
+  					has_building = no
+  					has_grown_pop = no
+            num_adjacent_tiles > 3
+  				}
+  				create_pop = {
+  					species = event_target:refugee_empire_founder_pop
+  				}
+  				set_building = building_capital_2
+          set_deposit = d_rich_energy_deposit
+  			}
+        random_tile = {
+  				limit = {
+  					has_grown_pop = no
+  					has_growing_pop = no
+  				}
+  				create_pop = {
+  					species = event_target:refugee_empire_founder_pop
+  				}
+          set_building = building_clinic
+  				set_deposit = d_rich_society_deposit
+  			}
+        random_tile = {
+  				limit = {
+  					has_grown_pop = no
+  					has_growing_pop = no
+  				}
+  				create_pop = {
+  					species = event_target:refugee_empire_founder_pop
+  				}
+          set_building = building_hydroponics_farm_2
+  				set_deposit = d_immense_farmland_deposit
+  			}
+        while = {
+  				count = 3
+  				create_army = {
+  					name = random
+  					owner = event_target:refugee_empire_country
+  					species = event_target:refugee_empire_founder_pop
+  					type = defense_army
+  				}
+  			}
+      }
+    }
+    last_created_country = {
+      country_event = { id = refugee_empire.301 days = 1 }
+    }
+  }
+}
+
+# refugee_empire.300s refer to setting up the refugee empire country
+# set up the refugee_empire_country
+country_event = {
+  id = refugee_empire.301
+  hide_window = yes
+  is_triggered_only = yes
+  immediate = {
+    capital_scope = { set_name = "Free Haven" }
+    set_policy = {
+      policy = food_stockpiling
+      option = food_stockpiling_2
+      cooldown = no
+    }
+    add_food = 1000
+    copy_techs_from = {
+			target = event_target:filthy_purger_country
+			except = {
+					# Horizon Signal
+          tech_akx_worm_1
+          tech_akx_worm_2
+          tech_akx_worm_3
+          # Ascensions
+          tech_telepathy
+          tech_precognition_interface
+          tech_psi_jump_drive_1
+          tech_psionic_theory
+          tech_neural_implants
+          tech_gene_seed_purification
+          tech_morphogenetic_field_mastery
+          # Machine Empire
+          tech_robomodding_m
+          tech_probability_theory
+          tech_binary_motivators
+          tech_nanite_assemblers
+          tech_adaptive_combat_algorithms
+          tech_biomechanics
+          tech_singularity_core
+          tech_modular_components
+          tech_intelligent_factories
+			}
+		}
+    give_technology = { tech = tech_wormhole_stabilization message = no }
+    give_technology = { tech = tech_tomb_world_adaption message = no }
+    give_technology = { tech = tech_colonization_2 message = no }
+    give_technology = { tech = tech_colonization_3 message = no }
+    give_technology = { tech = tech_colonization_4 message = no }
+    give_technology = { tech = tech_colonization_5 message = no }
+
+    # survey host's surveyed planets
+		every_planet = {
+			limit = {
+				is_surveyed = {
+					who = event_target:filthy_purger_country
+					status = yes
+				}
+			}
+			surveyed = {
+				set_surveyed = yes
+				surveyor = root
+			}
+		}
+    # survey all neighboring systems
+    capital_scope = {
+      solar_system = {
+        # jump 1
+        every_neighbor_system = {
+          limit = {
+            has_owner = no
+            NOR = {
+              solar_system = {
+    						has_star_flag = hostile_system
+    					}
+            }
+            solar_system = {
+    					NOT = { exists = starbase }
+    				}
+          }
+          solar_system = {
+            every_system_planet = {
+              surveyed = {
+        				set_surveyed = yes
+        				surveyor = root.owner
+        			}
+            }
+          }
+          # jump 2
+          every_neighbor_system = {
+            limit = {
+              has_owner = no
+              NOR = {
+                solar_system = {
+      						has_star_flag = hostile_system
+      					}
+              }
+              solar_system = {
+      					NOT = { exists = starbase }
+      				}
+            }
+            solar_system = {
+              every_system_planet = {
+                surveyed = {
+          				set_surveyed = yes
+          				surveyor = root.owner
+          			}
+              }
+            }
+            # jump 3
+            every_neighbor_system = {
+              limit = {
+                has_owner = no
+                NOR = {
+                  solar_system = {
+        						has_star_flag = hostile_system
+        					}
+                }
+                solar_system = {
+        					NOT = { exists = starbase }
+        				}
+              }
+              solar_system = {
+                every_system_planet = {
+                  surveyed = {
+            				set_surveyed = yes
+            				surveyor = root.owner
+            			}
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    # give construction ships x1
+    create_fleet = {
+			effect = {
+				set_owner = prev
+
+				create_ship = {
+					name = random
+					random_existing_design = constructor
+				}
+
+				set_fleet_stance = evasive
+				set_location = prev.capital_star
+			}
+		}
+    # give science ship with scientist
+    create_fleet = {
+			effect = {
+				set_owner = prev
+				create_ship = {
+					name = random
+					random_existing_design = science
+				}
+				set_fleet_stance = evasive
+				set_location = prev.capital_scope.star
+
+				owner = {
+					create_leader = {
+						type = scientist
+						sub_type = survey
+						name = random
+						species = owner_main_species
+					}
+				}
+				set_leader = last_created_leader
+			}
+		}
+  }
+}

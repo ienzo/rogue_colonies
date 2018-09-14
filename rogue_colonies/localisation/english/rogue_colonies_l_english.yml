@@ -1,0 +1,41 @@
+﻿l_english:
+
+rogue_colony_chain_title:0 ""
+rogue_colony_chain_desc:0 ""
+
+# Names
+
+NAME_rogue_colony:0 "[Root.Leader.GetName]'s Ascendancy"
+NAME_rogue_colony_country:0 "Galactic [Root.GetSpeciesAdj] Ascendancy"
+NAME_rogue_colony_fleet_1:0 "1st [Root.GetSpeciesAdj] Ascendant Flotilla"
+NAME_rogue_colony_fleet_2:0 "[Root.Leader.GetName]'s Will"
+NAME_rogue_colony_war:0 "[rogue_colony_empire.GetRulerName]'s War of Galactic Ascension"
+
+opinion_rogue_empire_is_better:0 "We're better than you!"
+opinion_traitors_to_our_empire:0 "Traitors to our country!"
+
+laconia.201.name:0 "The Rogue Colony"
+laconia.201.desc:0 "Subsersive elements on [Root.Capital.GetName] have stolen ships and resources and coordinated a secret escape among some radical people and established a rival star empire!"
+
+laconia.203.name:0 "Galactic [Root.GetSpeciesAdj] Ascendancy"
+laconia.203.desc:0 "This is [rogue_colony_empire.GetRulerName], the undisputed [rogue_colony_empire.GetRulerTitle] of the Galactic [Root.GetSpeciesAdj] Ascendancy, and soon, all galactic space. \n\nYou may recognize me as once a lowly admiral in your [Root.GetSpeciesAdj] navy."
+
+laconia.203.a:0 "[rogue_colony_empire.GetRulerName], why have you done this?"
+laconia.203.a.response:0 "The [Root.Owner.GetName], while extraordinary, lacks the vision required to rule the galaxy. I have this vision and I alone among the [Root.GetSpeciesNamePlural] have the will to rule the stars and immortalize the [Root.GetSpeciesAdj] race as [Root.GetSpeciesNamePluralCompliment] among the cosmos."
+
+laconia.203.b:0 "Where did you get such technologies?"
+laconia.203.b.response:0 "The capital of the Ascendancy was originally a hidden cache of ancient and advance technologies.\n\nAfter I have learned of the cache's exsistance, I began steps to prepare for the establishment of the Ascendancy. I conceled the existance of the cache and diverted resources and personnel to our secret base at [rogue_colony_empire.Capital.GetStarName] to build our new empire.\n\nThe paradise you see behind me is a result of the ancient technologies that are decades, if not centuries, more advance than current [Root.GetSpeciesAdj] tech. The [Root.Owner.GetName] are practically [Root.GetSpeciesNamePluralInsult] compared to the Ascendancy's power!"
+
+laconia.203.c:0 "So you were behind the missing ships and other anomalies!"
+laconia.203.c.response:0 "Yes, yes. Small evils to achieve a greater good.\n\nIf [root.GetRulerTitle] [Root.GetRulerName] bows to me, I will happily reimburse the [Root.Owner.GetName]."
+
+laconia.203.d:0 "You will be stopped. The [Root.Owner.GetName] will have justice!"
+laconia.203.d.response:0 "You cannot stop me! To the victor goes the spoils!\n\nNo-one can deny me the stars!"
+
+# One Planet Minors
+
+one_planet_minor.101.name:0 "An Uncharted Colony"
+one_planet_minor.101.desc:0 "It has become apparent that private interest groups in the [Root.Owner.GetName] have conspired to found a colony on [opm_planet.planet.GetName]. Because all colonies must have a charter from the government, the colony of [opm_empire.Capital.GetName] is technically illegal.\n\nAfter going public, the [opm_empire.owner.GetName] sent a formal delegation to treat with us."
+
+one_planet_minor.103.name:0 "The Delegates from [opm_empire.Capital.GetName]"
+one_planet_minor.103.desc:0 "We greet [root.GetRulerTitle] [Root.GetRulerName].\n\nWe come in peace!"

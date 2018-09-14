@@ -1,0 +1,397 @@
+# One planet minors are nations made from rogue colonists who aren't overpowered like the Ascendancy. Their habitable_planet did not pop out of nowhere like the Ascendancy.
+  # Grant them all habitablity technologies. They'll need it lol. The +5  habitablities and the tomb world habitablity. Could there be a check to prevent spawning on tomb worlds?
+    # There's a chance that the rogue colony will still spawn in a world they cannot inhabit. Sucks to be them lol
+  # Copy tech and copy survey from home.
+  # Can happen to AI
+  # Still retains the negative opinion from the homeworld as these are renegade colonists
+
+namespace = one_planet_minor
+
+# One planet minor is spawned
+
+country_event = {
+  id = one_planet_minor.101
+  title = one_planet_minor.101.name
+  desc = one_planet_minor.101.desc
+	picture = GFX_evt_news_room
+	show_sound = event_red_alert
+	location = event_target:opm_planet
+  is_triggered_only = yes
+
+  mean_time_to_happen = { months = 40 }
+  # should happen more than once to certain empires, and less to others. Certain traits inform diplomatic messages; i.e. trait_quarrelsome generates text saying they were quarrelsome
+    # should happen more often:
+      # trait_extremely_adaptive
+      # trait_adaptive
+      # trait_quarrelsome
+      # trait_nomadic
+      # trait_deviants
+      # trait_survivor
+    # should happen less often:
+      # trait_nonadaptive
+      # trait_traditional
+      # trait_sedentary
+      # trait_conformists
+
+  # find any free planet
+  trigger = {
+    is_ai = no
+		any_system = {
+			any_planet = {
+				is_colonizable = yes
+				has_owner = no
+				is_colony = no
+				habitable_planet = yes
+        habitability = { who = root.owner_species value > 0.39 }
+				has_anomaly = no
+				NOR = {
+          is_planet_class = pc_nuked
+					has_modifier = "holy_planet"
+					solar_system = {
+						has_star_flag = hostile_system
+					}
+				}
+				distance = {
+					source = root.owner.capital_scope
+					max_distance <= 300
+					min_distance >= 50
+				}
+				solar_system = {
+					NOT = { exists = starbase }
+				}
+			}
+		}
+	}
+
+  # build colony on any free planet
+  immediate = {
+    save_event_target_as = opm_origin_empire
+    owner_species = { save_event_target_as = opm_original_species }
+		random_planet = {
+      # Find a random planet
+			limit = {
+				is_colonizable = yes
+				has_owner = no
+				is_colony = no
+				habitable_planet = yes
+        habitability = { who = root.owner_species value > 0.39 }
+				has_anomaly = no
+        planet_size > 10
+				NOR = {
+          is_asteroid = yes
+          is_star = yes
+          is_planet_class = pc_gas_giant
+          is_planet_class = pc_ringworld_habitable
+          is_planet_class = pc_ringworld_habitable_damaged
+          is_planet_class = pc_ringworld_tech
+          is_planet_class = pc_ringworld_tech_damaged
+          is_planet_class = pc_ringworld_seam
+          is_planet_class = pc_ringworld_seam_damaged
+          is_planet_class = pc_habitat
+          is_planet_class = pc_nuked
+          has_modifier = "holy_planet"
+					solar_system = {
+						has_star_flag = hostile_system
+					}
+				}
+				distance = {
+					source = root.owner.capital_scope
+					max_distance <= 300
+					min_distance >= 50
+				}
+				solar_system = {
+					NOT = { exists = starbase }
+				}
+			}
+			orbital_deposit_tile = { clear_deposits = yes }
+			save_global_event_target_as = opm_planet
+		}
+		create_country = {
+			name = random
+			authority = random
+			civics = random
+      species = event_target:opm_original_species
+			ignore_initial_colony_error = yes
+      day_zero_contact = no
+			ethos = random
+			flag = random
+			type = default
+			effect = {
+				save_global_event_target_as = opm_empire
+				add_minerals = 5000
+				add_energy = 5000
+				add_food = 200
+				add_influence = 300
+        add_unity = 1000
+			}
+		}
+    # set up the capital
+		event_target:opm_planet = {
+			solar_system = {
+				create_starbase = {
+					size = starbase_starport
+					owner = event_target:opm_empire
+				}
+			}
+			set_owner = event_target:opm_empire
+			set_capital = yes
+			clear_blockers = yes
+			solar_system = {
+				every_system_planet = {
+					surveyed = {
+						set_surveyed = yes
+						surveyor = root.owner
+					}
+				}
+			}
+			random_tile = {
+				limit = {
+					has_building = no
+					has_grown_pop = no
+          num_adjacent_tiles > 3
+				}
+				create_pop = {
+					species = event_target:opm_original_species
+				}
+				set_building = building_capital_2
+        set_deposit = d_rich_energy_deposit
+			}
+      random_tile = {
+				limit = {
+					has_grown_pop = no
+					has_growing_pop = no
+				}
+				create_pop = {
+					species = event_target:opm_original_species
+				}
+        set_building = building_clinic
+				set_deposit = d_rich_society_deposit
+			}
+      random_tile = {
+				limit = {
+					has_grown_pop = no
+					has_growing_pop = no
+				}
+				create_pop = {
+					species = event_target:opm_original_species
+				}
+        set_building = building_hydroponics_farm_2
+				set_deposit = d_immense_farmland_deposit
+			}
+			while = {
+				count = 3
+				create_army = {
+					name = random
+					owner = event_target:opm_empire
+					species = event_target:opm_original_species
+					type = defense_army
+				}
+			}
+		}
+    last_created_country = {
+      country_event = { id = one_planet_minor.102 days = 1 }
+    }
+    every_country = {
+      establish_communications_no_message = event_target:opm_empire
+    }
+	}
+
+	option = {
+		name = "Let's see what these traitors have to say!"
+    hidden_effect = {
+      country_event = { id = one_planet_minor.103 }
+    }
+	}
+}
+
+# Rogue Colony Setting Up 1
+country_event = {
+  id = one_planet_minor.102
+  hide_window = yes
+  is_triggered_only = yes
+  # fire_only_once = yes
+
+  immediate = {
+    # change the name of the capital
+    # capital_scope = { set_name = NAME_opm_capital }
+    # get host's technologies
+    copy_techs_from = {
+			target = event_target:opm_origin_empire
+			except = {
+				# exclude techs here
+			}
+		}
+    # get more technologies
+    owner = {
+      give_technology = { tech = tech_wormhole_stabilization message = no }
+      give_technology = { tech = tech_tomb_world_adaption message = no }
+      give_technology = { tech = tech_colonization_2 message = no }
+      give_technology = { tech = tech_colonization_3 message = no }
+      give_technology = { tech = tech_colonization_4 message = no }
+      give_technology = { tech = tech_colonization_5 message = no }
+    }
+    # survey host's surveyed planets
+		every_planet = {
+			limit = {
+				is_surveyed = {
+					who = event_target:opm_origin_empire
+					status = yes
+				}
+			}
+			surveyed = {
+				set_surveyed = yes
+				surveyor = root
+			}
+		}
+    # survey all neighboring systems
+    capital_scope = {
+      solar_system = {
+        # jump 1
+        every_neighbor_system = {
+          limit = {
+            has_owner = no
+            NOR = {
+              solar_system = {
+    						has_star_flag = hostile_system
+    					}
+            }
+            solar_system = {
+    					NOT = { exists = starbase }
+    				}
+          }
+          solar_system = {
+            every_system_planet = {
+              surveyed = {
+        				set_surveyed = yes
+        				surveyor = root.owner
+        			}
+            }
+          }
+          # jump 2
+          every_neighbor_system = {
+            limit = {
+              has_owner = no
+              NOR = {
+                solar_system = {
+      						has_star_flag = hostile_system
+      					}
+              }
+              solar_system = {
+      					NOT = { exists = starbase }
+      				}
+            }
+            solar_system = {
+              every_system_planet = {
+                surveyed = {
+          				set_surveyed = yes
+          				surveyor = root.owner
+          			}
+              }
+            }
+            # jump 3
+            every_neighbor_system = {
+              limit = {
+                has_owner = no
+                NOR = {
+                  solar_system = {
+        						has_star_flag = hostile_system
+        					}
+                }
+                solar_system = {
+        					NOT = { exists = starbase }
+        				}
+              }
+              solar_system = {
+                every_system_planet = {
+                  surveyed = {
+            				set_surveyed = yes
+            				surveyor = root.owner
+            			}
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    # give construction ships x1
+    create_fleet = {
+			effect = {
+				set_owner = prev
+
+				create_ship = {
+					name = random
+					random_existing_design = constructor
+				}
+
+				set_fleet_stance = evasive
+				set_location = prev.capital_star
+			}
+		}
+    # give science ship with scientist
+    create_fleet = {
+			effect = {
+				set_owner = prev
+				create_ship = {
+					name = random
+					random_existing_design = science
+				}
+				set_fleet_stance = evasive
+				set_location = prev.capital_scope.star
+
+				owner = {
+					create_leader = {
+						type = scientist
+						sub_type = survey
+						name = random
+						species = owner_main_species
+					}
+				}
+				set_leader = last_created_leader
+			}
+		}
+  }
+}
+
+# talk to them
+
+country_event = {
+  id = one_planet_minor.103
+  title = one_planet_minor.103.name
+  desc = one_planet_minor.103.desc
+  diplomatic = yes
+  is_triggered_only = yes
+  picture_event_data = {
+    portrait = event_target:opm_empire
+    planet_background = event_target:opm_empire
+    graphical_culture = event_target:opm_empire
+    city_level = event_target:opm_empire
+    room = event_target:opm_empire
+  }
+
+  # the unchartered colony offers renumeration for damages in exchange for independence. Some negotiation is possible, chance of the opm to become a vassal. An option for an event declare_war if all negotiations fail. Differs per ethic. authoritarian and militarist would have an option to delcare war. Egalitarian, pacsifist, quarrelsome and deviants would allow the unchartered to exist.
+
+  option = {
+		name = one_planet_minor.103.a
+		response_text = one_planet_minor.103.a.response
+		is_dialog_only = yes
+	}
+  option = {
+		name = one_planet_minor.103.b
+		response_text = one_planet_minor.103.b.response
+		is_dialog_only = yes
+	}
+    option = {
+  		name = one_planet_minor.103.c
+  		response_text = one_planet_minor.103.c.response
+      is_dialog_only = yes
+  	}
+    option = {
+  		name = one_planet_minor.103.d
+  		response_text = one_planet_minor.103.response
+      # is_dialog_only = yes # remove to close dialog
+  	}
+}
+
+# war happens
+  # the origin empire would be the aggressor. The new empire would get event ships using pirate designs. Not total war, the CB of the origin empire would be whole annexation while the new empire would be independence.

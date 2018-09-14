@@ -1,0 +1,16 @@
+# OPINION MODIFIERS
+
+# Rogue Empire Opinion to home empire
+	# rogue_colony_empire to rogue_colony_victim
+opinion_rogue_empire_is_better = {
+	opinion = {
+		base = -100
+	}
+}
+# home empire to rogue empires
+	# rogue_colony_victim to rogue_colony_empire
+opinion_traitors_to_our_empire = {
+	opinion = {
+		base = -100
+	}
+}
